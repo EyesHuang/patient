@@ -1,7 +1,6 @@
 package http
 
 import (
-	"encoding/json"
 	"net/http"
 	"strconv"
 
@@ -29,29 +28,42 @@ func (s *Server) HandlerUpdateOrder() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 32)
+		reqOrder, err := preProcessData(r)
 		if err != nil {
 			s.respond(r, w, err, http.StatusBadRequest)
 			return
 		}
 
-		order, err := s.patientRepo.GetOrderByID(ctx, int32(id))
-		if err != nil {
+		if _, err := s.patientRepo.GetOrderByID(ctx, int32(reqOrder.ID)); err != nil {
 			s.respond(r, w, err, http.StatusInternalServerError)
 			return
 		}
 
-		var req *patient.Order
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			s.respond(r, w, nil, http.StatusBadRequest)
-			return
-		}
-
-		if err := s.patientRepo.UpdateOrder(ctx, req); err != nil {
+		if err := s.patientRepo.UpdateOrder(ctx, reqOrder); err != nil {
 			s.respond(r, w, err, http.StatusInternalServerError)
 			return
 		}
 
-		s.respond(r, w, order, http.StatusOK)
+		s.respond(r, w, reqOrder, http.StatusOK)
 	}
+}
+
+func preProcessData(r *http.Request) (*patient.Order, error) {
+	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 32)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := r.ParseMultipartForm(10 << 20); err != nil {
+		return nil, err
+	}
+
+	message := r.Form.Get("message")
+
+	order := &patient.Order{
+		ID:      int(id),
+		Message: message,
+	}
+
+	return order, err
 }
