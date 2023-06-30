@@ -3,7 +3,7 @@
 This project primarily provides two web services for interacting with patient data.
 
 ## Available Services
-
+This project offers the following services. For a detailed API document, please navigate to the doc directory:
 - `GET /patients`: Retrieve information for all patients.
 - `PUT /orders/{id}`: Update a specified medical order using its ID.
 
