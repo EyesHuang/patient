@@ -40,6 +40,7 @@ func (pr *PatientRepository) GetAllPatients(ctx context.Context) (*[]patient.Pat
 
 	for _, pRow := range pRows {
 		order := patient.Order{
+			ID:      int(pRow.OrderID),
 			Message: pRow.OrderMessage.String,
 		}
 

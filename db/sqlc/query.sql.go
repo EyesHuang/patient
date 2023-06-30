@@ -14,6 +14,7 @@ const getAll = `-- name: GetAll :many
 SELECT
     patient.id AS patient_id,
     patient.name AS patient_name,
+    medical_order.id AS order_id,
     medical_order.message AS order_message
 FROM
     patient
@@ -23,6 +24,7 @@ FROM
 type GetAllRow struct {
 	PatientID    int32
 	PatientName  sql.NullString
+	OrderID      int32
 	OrderMessage sql.NullString
 }
 
@@ -35,7 +37,12 @@ func (q *Queries) GetAll(ctx context.Context) ([]GetAllRow, error) {
 	var items []GetAllRow
 	for rows.Next() {
 		var i GetAllRow
-		if err := rows.Scan(&i.PatientID, &i.PatientName, &i.OrderMessage); err != nil {
+		if err := rows.Scan(
+			&i.PatientID,
+			&i.PatientName,
+			&i.OrderID,
+			&i.OrderMessage,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
