@@ -3,7 +3,8 @@
 This project primarily provides two web services for interacting with patient data.
 
 ## Available Services
-This project offers the following services. For a detailed API document, please navigate to the `doc` directory:
+This project offers two key services. Detailed API documentation can be found within the `doc` directory in a file named `api.yaml`. To view and interact with the API documentation, open the file using [Swagger Editor](https://editor.swagger.io/).
+
 - `GET /patients`: Retrieve information for all patients.
 - `PUT /orders/{id}`: Update a specified medical order using its ID.
 
