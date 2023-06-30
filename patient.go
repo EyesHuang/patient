@@ -1,5 +1,9 @@
 package patients
 
+import (
+	"context"
+)
+
 // Patient is domain object
 type Patient struct {
 	ID    int    `json:"id"`
@@ -10,4 +14,8 @@ type Patient struct {
 // Order is domain object
 type Order struct {
 	Message string `json:"message"`
+}
+
+type PatientRepository interface {
+	GetAllPatients(ctx context.Context) (*[]Patient, error)
 }

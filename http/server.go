@@ -6,19 +6,22 @@ import (
 	"log"
 	"net/http"
 
+	patient "manage-patinets"
+
 	"github.com/go-chi/chi/v5"
-	target "manage-patinets"
 )
 
 // Server is an HTTP server which embeds a chi router
 type Server struct {
-	router *chi.Mux
+	router      *chi.Mux
+	patientRepo patient.PatientRepository
 }
 
 // NewServer creates and configures a new Server instance
-func NewServer(p ...Pinger) *Server {
+func NewServer(patientRepo patient.PatientRepository, p ...Pinger) *Server {
 	s := Server{
-		router: chi.NewRouter(),
+		router:      chi.NewRouter(),
+		patientRepo: patientRepo,
 	}
 	s.routes(p...)
 	return &s
@@ -47,7 +50,7 @@ func (s *Server) respond(r *http.Request, w http.ResponseWriter, data interface{
 			res.Errors = append(res.Errors, ce.Error())
 		}
 		body = res
-	case *[]target.Patient, []string, nil:
+	case *[]patient.Patient, []string, nil:
 		body = data
 	default:
 		body = nil
