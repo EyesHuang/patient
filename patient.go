@@ -13,9 +13,11 @@ type Patient struct {
 
 // Order is domain object
 type Order struct {
+	ID      int    `json:"id"`
 	Message string `json:"message"`
 }
 
 type PatientRepository interface {
 	GetAllPatients(ctx context.Context) (*[]Patient, error)
+	Update(ctx context.Context, order *Order) (*Order, error)
 }

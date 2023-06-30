@@ -50,7 +50,7 @@ func (s *Server) respond(r *http.Request, w http.ResponseWriter, data interface{
 			res.Errors = append(res.Errors, ce.Error())
 		}
 		body = res
-	case *[]patient.Patient, []string, nil:
+	case *[]patient.Patient, *patient.Order:
 		body = data
 	default:
 		body = nil

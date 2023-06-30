@@ -6,3 +6,8 @@ SELECT
 FROM
     patient
         JOIN medical_order ON patient.order_id = medical_order.id;
+
+-- name: UpdateOrder :exec
+UPDATE medical_order
+SET message = @message
+WHERE id = @id;

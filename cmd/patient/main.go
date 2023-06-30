@@ -12,6 +12,7 @@ import (
 	rHttp "manage-patinets/http"
 
 	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 )
 
 const (

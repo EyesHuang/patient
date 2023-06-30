@@ -48,3 +48,19 @@ func (q *Queries) GetAll(ctx context.Context) ([]GetAllRow, error) {
 	}
 	return items, nil
 }
+
+const updateOrder = `-- name: UpdateOrder :exec
+UPDATE medical_order
+SET message = $1
+    WHERE id = $2
+`
+
+type UpdateOrderParams struct {
+	Message sql.NullString
+	ID      int32
+}
+
+func (q *Queries) UpdateOrder(ctx context.Context, arg UpdateOrderParams) error {
+	_, err := q.db.ExecContext(ctx, updateOrder, arg.Message, arg.ID)
+	return err
+}

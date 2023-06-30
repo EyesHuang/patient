@@ -11,6 +11,7 @@ import (
 type PatientCommands interface {
 	WithTx(tx *sql.Tx) *sqlc.Queries
 	GetAll(ctx context.Context) ([]sqlc.GetAllRow, error)
+	UpdateOrder(ctx context.Context, arg sqlc.UpdateOrderParams) error
 }
 
 type PatientRepository struct {
@@ -51,4 +52,20 @@ func (pr *PatientRepository) GetAllPatients(ctx context.Context) (*[]patient.Pat
 	}
 
 	return &patients, nil
+}
+
+func (pr *PatientRepository) Update(ctx context.Context, order *patient.Order) (*patient.Order, error) {
+	params := sqlc.UpdateOrderParams{
+		Message: sql.NullString{
+			String: order.Message,
+			Valid:  true,
+		},
+		ID: int32(order.ID),
+	}
+
+	if err := pr.commands.UpdateOrder(ctx, params); err != nil {
+		return nil, err
+	}
+
+	return order, nil
 }
