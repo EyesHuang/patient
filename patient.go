@@ -19,5 +19,6 @@ type Order struct {
 
 type PatientRepository interface {
 	GetAllPatients(ctx context.Context) (*[]Patient, error)
-	Update(ctx context.Context, order *Order) (*Order, error)
+	GetOrderByID(ctx context.Context, id int32) (*Order, error)
+	UpdateOrder(ctx context.Context, order *Order) error
 }

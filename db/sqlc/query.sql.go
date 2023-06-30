@@ -10,7 +10,7 @@ import (
 	"database/sql"
 )
 
-const getAll = `-- name: GetAll :many
+const getAllPatients = `-- name: GetAllPatients :many
 SELECT
     patient.id AS patient_id,
     patient.name AS patient_name,
@@ -21,22 +21,22 @@ FROM
         JOIN medical_order ON patient.order_id = medical_order.id
 `
 
-type GetAllRow struct {
+type GetAllPatientsRow struct {
 	PatientID    int32
 	PatientName  sql.NullString
 	OrderID      int32
 	OrderMessage sql.NullString
 }
 
-func (q *Queries) GetAll(ctx context.Context) ([]GetAllRow, error) {
-	rows, err := q.db.QueryContext(ctx, getAll)
+func (q *Queries) GetAllPatients(ctx context.Context) ([]GetAllPatientsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getAllPatients)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []GetAllRow
+	var items []GetAllPatientsRow
 	for rows.Next() {
-		var i GetAllRow
+		var i GetAllPatientsRow
 		if err := rows.Scan(
 			&i.PatientID,
 			&i.PatientName,
@@ -56,10 +56,22 @@ func (q *Queries) GetAll(ctx context.Context) ([]GetAllRow, error) {
 	return items, nil
 }
 
+const getOrderByID = `-- name: GetOrderByID :one
+SELECT id, message FROM medical_order
+WHERE id = $1
+`
+
+func (q *Queries) GetOrderByID(ctx context.Context, id int32) (MedicalOrder, error) {
+	row := q.db.QueryRowContext(ctx, getOrderByID, id)
+	var i MedicalOrder
+	err := row.Scan(&i.ID, &i.Message)
+	return i, err
+}
+
 const updateOrder = `-- name: UpdateOrder :exec
 UPDATE medical_order
 SET message = $1
-    WHERE id = $2
+WHERE id = $2
 `
 
 type UpdateOrderParams struct {

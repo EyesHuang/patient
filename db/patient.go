@@ -10,7 +10,8 @@ import (
 
 type PatientCommands interface {
 	WithTx(tx *sql.Tx) *sqlc.Queries
-	GetAll(ctx context.Context) ([]sqlc.GetAllRow, error)
+	GetAllPatients(ctx context.Context) ([]sqlc.GetAllPatientsRow, error)
+	GetOrderByID(ctx context.Context, id int32) (sqlc.MedicalOrder, error)
 	UpdateOrder(ctx context.Context, arg sqlc.UpdateOrderParams) error
 }
 
@@ -31,7 +32,7 @@ func NewPatientRepository(db *sql.DB) *PatientRepository {
 }
 
 func (pr *PatientRepository) GetAllPatients(ctx context.Context) (*[]patient.Patient, error) {
-	pRows, err := pr.commands.GetAll(ctx)
+	pRows, err := pr.commands.GetAllPatients(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +56,21 @@ func (pr *PatientRepository) GetAllPatients(ctx context.Context) (*[]patient.Pat
 	return &patients, nil
 }
 
-func (pr *PatientRepository) Update(ctx context.Context, order *patient.Order) (*patient.Order, error) {
+func (pr *PatientRepository) GetOrderByID(ctx context.Context, id int32) (*patient.Order, error) {
+	pOrder, err := pr.commands.GetOrderByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	o := patient.Order{
+		ID:      int(pOrder.ID),
+		Message: pOrder.Message.String,
+	}
+
+	return &o, nil
+}
+
+func (pr *PatientRepository) UpdateOrder(ctx context.Context, order *patient.Order) error {
 	params := sqlc.UpdateOrderParams{
 		Message: sql.NullString{
 			String: order.Message,
@@ -65,8 +80,8 @@ func (pr *PatientRepository) Update(ctx context.Context, order *patient.Order) (
 	}
 
 	if err := pr.commands.UpdateOrder(ctx, params); err != nil {
-		return nil, err
+		return err
 	}
 
-	return order, nil
+	return nil
 }
